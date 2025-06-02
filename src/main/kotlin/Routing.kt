@@ -16,7 +16,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.configureRouting() {
     routing {
-        get("/") {
+        get("/sights") {
             call.respond(getSights())
         }
     }
