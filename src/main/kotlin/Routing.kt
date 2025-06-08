@@ -2,7 +2,7 @@ package com.example
 
 import com.example.data.Location
 import com.example.data.SightEntity
-import com.example.data.Sights
+import com.example.data.Sight
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -16,7 +16,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.configureRouting() {
     routing {
-        get("/") {
+        get("/sights") {
             call.respond(getSights())
         }
     }
@@ -25,13 +25,13 @@ fun Application.configureRouting() {
 fun initDatabase() {
     Database.connect("jdbc:sqlite:sights.db", driver = "org.sqlite.JDBC")
     transaction {
-        SchemaUtils.create(Sights) // Создание таблицы, если она не существует
+        SchemaUtils.create(Sight)
     }
 }
 
 fun addSight(sight: SightEntity) {
     transaction {
-        Sights.insert {
+        Sight.insert {
             it[address] = sight.address
             it[latitude] = sight.location.latitude
             it[longitude] = sight.location.longitude
@@ -43,13 +43,12 @@ fun addSight(sight: SightEntity) {
 
 fun getSights(): List<SightEntity> {
     return transaction {
-        Sights.selectAll().map {
+        Sight.selectAll().map {
             SightEntity(
-                id = it[Sights.id].value,
-                address = it[Sights.address],
-                location = Location(it[Sights.latitude], it[Sights.longitude]),
-                name = it[Sights.name],
-                description = it[Sights.description]
+                address = it[Sight.address],
+                location = Location(it[Sight.latitude], it[Sight.longitude]),
+                name = it[Sight.name],
+                description = it[Sight.description]
             )
         }
     }
@@ -57,7 +56,7 @@ fun getSights(): List<SightEntity> {
 
 fun deleteSight(id: Int) {
     transaction {
-        Sights.deleteWhere { Sights.id eq id }
+        Sight.deleteWhere { Sight.id eq id }
     }
 }
 
